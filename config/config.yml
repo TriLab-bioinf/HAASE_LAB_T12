@@ -1,0 +1,28 @@
+# Metadata
+reference:  
+    abundant_rna_file: data/00ref/abundant_rna.fasta
+    ensembl_ver: 38
+    ensembl_gtf: data/00ref/gencode.v39.primary_assembly.annotation.gtf
+    genome_build: hg38
+    genome_file: data/00ref/GRCh38.primary_assembly.genome.fa
+    star_index: NA
+    genome_source: https://www.gencodegenes.org/human/
+star_db:
+    star_dir: data/star
+    sjdbOverhang: 49 
+samples:
+    HEK293_S8_cytoplasmic_dmso_3hrs_1:
+    HEK293_S8_cytoplasmic_dmso_3hrs_2:
+    HEK293_S8_cytoplasmic_dmso_3hrs_3:
+    HEK293_S8_cytoplasmic_kpt185_3hrs_1:
+    HEK293_S8_cytoplasmic_kpt185_3hrs_2:
+    HEK293_S8_cytoplasmic_kpt185_3hrs_3:
+    HEK293_S8_nuclear_dmso_3hrs_1:
+    HEK293_S8_nuclear_dmso_3hrs_2:
+    HEK293_S8_nuclear_dmso_3hrs_3:
+    HEK293_S8_nuclear_kpt185_3hrs_1:
+    HEK293_S8_nuclear_kpt185_3hrs_2:
+    HEK293_S8_nuclear_kpt185_3hrs_3:
+
+
+
