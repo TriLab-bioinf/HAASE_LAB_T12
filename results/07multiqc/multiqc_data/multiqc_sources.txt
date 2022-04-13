@@ -1,0 +1,121 @@
+Module	Section	Sample Name	Source
+featureCounts	all_sections	results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_nuclear_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_nuclear_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_nuclear_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+featureCounts	all_sections	results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/05counts/read_counts.summary
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_nuclear_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_nuclear_dmso_3hrs_1.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_cytoplasmic_dmso_3hrs_3.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_nuclear_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_nuclear_dmso_3hrs_3.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_cytoplasmic_dmso_3hrs_1.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_cytoplasmic_kpt185_3hrs_3.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_cytoplasmic_dmso_3hrs_2.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_nuclear_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_nuclear_kpt185_3hrs_3.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_cytoplasmic_kpt185_3hrs_2.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_nuclear_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_nuclear_dmso_3hrs_2.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_cytoplasmic_kpt185_3hrs_1.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_nuclear_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_nuclear_kpt185_3hrs_1.sorted.dedup.metrics.txt
+Picard	DuplicationMetrics	results | 04dedup | HEK293_S8_nuclear_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/04dedup/HEK293_S8_nuclear_kpt185_3hrs_2.sorted.dedup.metrics.txt
+BBTools	all_sections	results | 01trim | HEK293_S8_nuclear_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_nuclear_dmso_3hrs_1.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_cytoplasmic_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_cytoplasmic_dmso_3hrs_3.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_nuclear_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_nuclear_kpt185_3hrs_1.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_cytoplasmic_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_cytoplasmic_dmso_3hrs_1.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_nuclear_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_nuclear_kpt185_3hrs_2.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_cytoplasmic_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_cytoplasmic_kpt185_3hrs_2.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_nuclear_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_nuclear_dmso_3hrs_2.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_cytoplasmic_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_cytoplasmic_dmso_3hrs_2.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_cytoplasmic_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_cytoplasmic_kpt185_3hrs_3.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_cytoplasmic_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_cytoplasmic_kpt185_3hrs_1.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_nuclear_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_nuclear_kpt185_3hrs_3.stats.log
+BBTools	all_sections	results | 01trim | HEK293_S8_nuclear_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/01trim/HEK293_S8_nuclear_dmso_3hrs_3.stats.log
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_kpt185_3hrs_2Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_dmso_3hrs_1Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_dmso_3hrs_3Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_dmso_3hrs_3Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_kpt185_3hrs_3Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_kpt185_3hrs_2Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_kpt185_3hrs_3Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_dmso_3hrs_2Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_dmso_3hrs_1Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_kpt185_3hrs_1Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_dmso_3hrs_2Log.final.out
+STAR	SummaryLog	results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_kpt185_3hrs_1Log.final.out
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_dmso_3hrs_2ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_dmso_3hrs_1ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_dmso_3hrs_3ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_kpt185_3hrs_1ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_kpt185_3hrs_3ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_dmso_3hrs_1ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_kpt185_3hrs_2ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_kpt185_3hrs_3ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_dmso_3hrs_2ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_kpt185_3hrs_2ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_cytoplasmic_kpt185_3hrs_1ReadsPerGene.out.tab
+STAR	ReadsPerGene	results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/03map_reads/HEK293_S8_nuclear_dmso_3hrs_3ReadsPerGene.out.tab
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_cytoplasmic_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_cytoplasmic_dmso_3hrs_3.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_cytoplasmic_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_cytoplasmic_dmso_3hrs_2.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_nuclear_dmso_3hrs_2.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_cytoplasmic_kpt185_3hrs_3.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_cytoplasmic_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_cytoplasmic_dmso_3hrs_1.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_nuclear_kpt185_3hrs_2.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_nuclear_dmso_3hrs_1.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_cytoplasmic_kpt185_3hrs_1.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_cytoplasmic_kpt185_3hrs_2.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_nuclear_kpt185_3hrs_1.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_nuclear_dmso_3hrs_3.log
+Bowtie 2 / HiSAT2	all_sections	results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_3	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/02abundant/HEK293_S8_nuclear_kpt185_3hrs_3.log
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_kpt185_3hrs_1.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_kpt185_3hrs_1.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_1.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_dmso_3hrs_1.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_kpt185_3hrs_1.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_kpt185_3hrs_1.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_3.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_dmso_3hrs_3.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_2.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_dmso_3hrs_2.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_kpt185_3hrs_1.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_kpt185_3hrs_1.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_kpt185_3hrs_1.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_kpt185_3hrs_1.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_kpt185_3hrs_3.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_kpt185_3hrs_3.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_1.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_dmso_3hrs_1.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_kpt185_3hrs_2.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_kpt185_3hrs_2.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_kpt185_3hrs_3.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_kpt185_3hrs_3.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_dmso_3hrs_3.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_dmso_3hrs_3.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_dmso_3hrs_3.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_dmso_3hrs_3.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_2.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_dmso_3hrs_2.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_dmso_3hrs_1.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_dmso_3hrs_1.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_kpt185_3hrs_2.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_kpt185_3hrs_2.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_kpt185_3hrs_2.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_kpt185_3hrs_2.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_kpt185_3hrs_3.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_kpt185_3hrs_3.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_dmso_3hrs_2.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_dmso_3hrs_2.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_dmso_3hrs_2.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_dmso_3hrs_2.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_3.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_cytoplasmic_dmso_3hrs_3.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_dmso_3hrs_1.R1	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_dmso_3hrs_1.R1_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_kpt185_3hrs_2.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_kpt185_3hrs_2.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_raw | HEK293_S8_nuclear_kpt185_3hrs_3.R2	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_raw/HEK293_S8_nuclear_kpt185_3hrs_3.R2_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_dmso_3hrs_3.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_dmso_3hrs_3.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_kpt185_3hrs_3.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_kpt185_3hrs_3.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_kpt185_3hrs_1.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_kpt185_3hrs_1.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_dmso_3hrs_3.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_dmso_3hrs_3.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_dmso_3hrs_1.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_dmso_3hrs_1.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_kpt185_3hrs_2.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_kpt185_3hrs_2.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_kpt185_3hrs_2.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_kpt185_3hrs_2.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_dmso_3hrs_2.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_dmso_3hrs_2.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_dmso_3hrs_1.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_dmso_3hrs_1.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_dmso_3hrs_1.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_dmso_3hrs_1.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_dmso_3hrs_2.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_dmso_3hrs_2.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_dmso_3hrs_2.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_dmso_3hrs_2.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_kpt185_3hrs_3.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_kpt185_3hrs_3.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_kpt185_3hrs_1.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_kpt185_3hrs_1.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_kpt185_3hrs_1.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_kpt185_3hrs_1.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_dmso_3hrs_3.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_dmso_3hrs_3.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_dmso_3hrs_2.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_dmso_3hrs_2.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_dmso_3hrs_1.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_dmso_3hrs_1.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_kpt185_3hrs_2.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_kpt185_3hrs_2.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_kpt185_3hrs_1.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_kpt185_3hrs_1.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_dmso_3hrs_3.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_dmso_3hrs_3.2P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_kpt185_3hrs_2.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_kpt185_3hrs_2.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_nuclear_kpt185_3hrs_3.1P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_nuclear_kpt185_3hrs_3.1P_fastqc.zip
+FastQC	all_sections	results | 06fastqc_trim | HEK293_S8_cytoplasmic_kpt185_3hrs_3.2P	/gpfs/gsfs12/users/lorenziha/ASTRID_HAASE/results/06fastqc_trim/HEK293_S8_cytoplasmic_kpt185_3hrs_3.2P_fastqc.zip
