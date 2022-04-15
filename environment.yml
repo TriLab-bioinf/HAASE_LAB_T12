@@ -14,3 +14,4 @@ dependencies:
   - multiqc =1.11
   - subread =2.0.1
   - samtools=1.14
+  - tetoolkit=2.2.1  

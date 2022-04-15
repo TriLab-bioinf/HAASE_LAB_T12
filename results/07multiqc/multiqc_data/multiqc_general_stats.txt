@@ -1,52 +1,52 @@
 Sample	Bowtie 2 / HiSAT2_mqc-generalstats-bowtie_2_hisat2-overall_alignment_rate	STAR_mqc-generalstats-star-uniquely_mapped_percent	STAR_mqc-generalstats-star-uniquely_mapped	Picard_mqc-generalstats-picard-PERCENT_DUPLICATION	featureCounts_mqc-generalstats-featurecounts-percent_assigned	featureCounts_mqc-generalstats-featurecounts-Assigned	FastQC_mqc-generalstats-fastqc-percent_duplicates	FastQC_mqc-generalstats-fastqc-percent_gc	FastQC_mqc-generalstats-fastqc-avg_sequence_length	FastQC_mqc-generalstats-fastqc-percent_fails	FastQC_mqc-generalstats-fastqc-total_sequences
 results | 02abundant | HEK293_S8_cytoplasmic_dmso_3hrs_1	2.66										
-results | 02abundant | HEK293_S8_cytoplasmic_dmso_3hrs_2	3.64										
-results | 02abundant | HEK293_S8_cytoplasmic_dmso_3hrs_3	3.0										
-results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_1	2.2										
-results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_2	2.55										
-results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_3	2.6										
-results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_1	9.96										
-results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_2	8.05										
-results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_3	8.42										
-results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_1	9.12										
-results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_2	8.32										
-results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_3	9.04										
-results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_1		88.05	26292547.0								
-results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_2		88.59	15852600.0								
-results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_3		88.64	22517157.0								
-results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_1		87.09	17636361.0								
-results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_2		88.06	28176149.0								
-results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_3		88.22	19457302.0								
-results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_1		90.08	14828288.0								
+results | 02abundant | HEK293_S8_cytoplasmic_dmso_3hrs_2	3.63										
+results | 02abundant | HEK293_S8_cytoplasmic_dmso_3hrs_3	2.99										
+results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_1	2.19										
+results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_2	2.54										
+results | 02abundant | HEK293_S8_cytoplasmic_kpt185_3hrs_3	2.59										
+results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_1	9.95										
+results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_2	8.04										
+results | 02abundant | HEK293_S8_nuclear_dmso_3hrs_3	8.41										
+results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_1	9.11										
+results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_2	8.31										
+results | 02abundant | HEK293_S8_nuclear_kpt185_3hrs_3	9.03										
+results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_1		88.05	26292546.0								
+results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_2		88.59	15852595.0								
+results | 03map_reads | HEK293_S8_cytoplasmic_dmso_3hrs_3		88.64	22517158.0								
+results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_1		87.09	17636360.0								
+results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_2		88.06	28176147.0								
+results | 03map_reads | HEK293_S8_cytoplasmic_kpt185_3hrs_3		88.22	19457299.0								
+results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_1		90.08	14828284.0								
 results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_2		90.99	15340416.0								
-results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_3		90.55	17092874.0								
-results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_1		90.47	18751886.0								
-results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_2		90.36	28936049.0								
-results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_3		90.35	14945815.0								
-results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_1				0.18055							
-results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_2				0.142403							
-results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_3				0.160394							
-results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_1				0.143755							
-results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_2				0.192573							
-results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_3				0.162344							
+results | 03map_reads | HEK293_S8_nuclear_dmso_3hrs_3		90.55	17092875.0								
+results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_1		90.47	18751892.0								
+results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_2		90.36	28936053.0								
+results | 03map_reads | HEK293_S8_nuclear_kpt185_3hrs_3		90.35	14945821.0								
+results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_1				0.180548							
+results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_2				0.1424							
+results | 04dedup | HEK293_S8_cytoplasmic_dmso_3hrs_3				0.160393							
+results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_1				0.143753							
+results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_2				0.192571							
+results | 04dedup | HEK293_S8_cytoplasmic_kpt185_3hrs_3				0.162342							
 results | 04dedup | HEK293_S8_nuclear_dmso_3hrs_1				0.071588							
 results | 04dedup | HEK293_S8_nuclear_dmso_3hrs_2				0.063999							
 results | 04dedup | HEK293_S8_nuclear_dmso_3hrs_3				0.066269							
 results | 04dedup | HEK293_S8_nuclear_kpt185_3hrs_1				0.079256							
 results | 04dedup | HEK293_S8_nuclear_kpt185_3hrs_2				0.077935							
 results | 04dedup | HEK293_S8_nuclear_kpt185_3hrs_3				0.072083							
-results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_1					85.14982385354767	23779105					
-results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_2					85.61112166696864	14751726					
-results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_3					84.81092566771031	20371201					
-results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_1					84.18704606464753	16727024					
-results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_2					84.40468725290046	25325082					
-results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_3					84.3957261263465	17967856					
-results | 05counts | HEK293_S8_nuclear_dmso_3hrs_1					43.387777257864705	7322448					
-results | 05counts | HEK293_S8_nuclear_dmso_3hrs_2					43.13028392923269	7616109					
-results | 05counts | HEK293_S8_nuclear_dmso_3hrs_3					46.29939856907395	9193122					
-results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_1					44.862972721953675	9542370					
-results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_2					42.7986500291932	14131976					
-results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_3					46.78851497058317	8191656					
+results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_1					85.15226079677495	23779089					
+results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_2					85.61586922719722	14751723					
+results | 05counts | HEK293_S8_cytoplasmic_dmso_3hrs_3					84.8126578538833	20371193					
+results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_1					84.1883050489086	16727030					
+results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_2					84.409548752424	25325077					
+results | 05counts | HEK293_S8_cytoplasmic_kpt185_3hrs_3					84.39794901240056	17967860					
+results | 05counts | HEK293_S8_nuclear_dmso_3hrs_1					43.38740291904423	7322446					
+results | 05counts | HEK293_S8_nuclear_dmso_3hrs_2					43.12992977215989	7616109					
+results | 05counts | HEK293_S8_nuclear_dmso_3hrs_3					46.29838426675573	9193122					
+results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_1					44.86291160310738	9542357					
+results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_2					42.79886914243483	14131991					
+results | 05counts | HEK293_S8_nuclear_kpt185_3hrs_3					46.787966082633496	8191675					
 results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_1.R1							50.26887054233474	48.0	50.0	27.27272727272727	31229700.0
 results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_1.R2							41.179835029999815	51.0	50.0	18.181818181818183	31229700.0
 results | 06fastqc_raw | HEK293_S8_cytoplasmic_dmso_3hrs_2.R1							45.18872789430621	47.0	50.0	18.181818181818183	18845582.0

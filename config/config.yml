@@ -7,9 +7,12 @@ reference:
     genome_file: data/00ref/GRCh38.primary_assembly.genome.fa
     star_index: NA
     genome_source: https://www.gencodegenes.org/human/
+    te_gtf: data/00ref/GRCh38_GENCODE_rmsk_TE.gtf
 star_db:
     star_dir: data/star
-    sjdbOverhang: 49 
+    sjdbOverhang: 49
+TEcounts:
+        stranded: reverse    
 samples:
     HEK293_S8_cytoplasmic_dmso_3hrs_1:
     HEK293_S8_cytoplasmic_dmso_3hrs_2:

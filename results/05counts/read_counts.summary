@@ -1,5 +1,5 @@
 Status	results/04dedup/HEK293_S8_cytoplasmic_dmso_3hrs_1.sorted.dedup.bam	results/04dedup/HEK293_S8_cytoplasmic_dmso_3hrs_2.sorted.dedup.bam	results/04dedup/HEK293_S8_cytoplasmic_dmso_3hrs_3.sorted.dedup.bam	results/04dedup/HEK293_S8_cytoplasmic_kpt185_3hrs_1.sorted.dedup.bam	results/04dedup/HEK293_S8_cytoplasmic_kpt185_3hrs_2.sorted.dedup.bam	results/04dedup/HEK293_S8_cytoplasmic_kpt185_3hrs_3.sorted.dedup.bam	results/04dedup/HEK293_S8_nuclear_dmso_3hrs_1.sorted.dedup.bam	results/04dedup/HEK293_S8_nuclear_dmso_3hrs_2.sorted.dedup.bam	results/04dedup/HEK293_S8_nuclear_dmso_3hrs_3.sorted.dedup.bam	results/04dedup/HEK293_S8_nuclear_kpt185_3hrs_1.sorted.dedup.bam	results/04dedup/HEK293_S8_nuclear_kpt185_3hrs_2.sorted.dedup.bam	results/04dedup/HEK293_S8_nuclear_kpt185_3hrs_3.sorted.dedup.bam
-Assigned	23779105	14751726	20371201	16727024	25325082	17967856	7322448	7616109	9193122	9542370	14131976	8191656
+Assigned	23779089	14751723	20371193	16727030	25325077	17967860	7322446	7616109	9193122	9542357	14131991	8191675
 Unassigned_Unmapped	0	0	0	0	0	0	0	0	0	0	0	0
 Unassigned_Read_Type	0	0	0	0	0	0	0	0	0	0	0	0
 Unassigned_Singleton	0	0	0	0	0	0	0	0	0	0	0	0
@@ -10,6 +10,6 @@ Unassigned_Duplicate	0	0	0	0	0	0	0	0	0	0	0	0
 Unassigned_MultiMapping	0	0	0	0	0	0	0	0	0	0	0	0
 Unassigned_Secondary	0	0	0	0	0	0	0	0	0	0	0	0
 Unassigned_NonSplit	0	0	0	0	0	0	0	0	0	0	0	0
-Unassigned_NoFeatures	4147089	2479360	3648347	3141857	4679273	3322151	9554305	10042270	10662691	11727665	18887701	9316179
+Unassigned_NoFeatures	4146287	2478404	3647855	3141561	4677544	3321591	9554448	10042415	10663126	11727678	18887552	9316406
 Unassigned_Overlapping_Length	0	0	0	0	0	0	0	0	0	0	0	0
 Unassigned_Ambiguity	0	0	0	0	0	0	0	0	0	0	0	0
