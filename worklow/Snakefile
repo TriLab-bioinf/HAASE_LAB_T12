@@ -3,25 +3,29 @@
 # RNAseq workflow v1.0
 # Hernan Lorenzi
 # hernan.lorenzi@nih.gov
-# Workflow requires to have a STAR index already available within the data/00ref directory
 # Also, it is necessary to configure the config.yml file accordingly to include all metadatata required.
+# 
 
 import os
 import glob
+os.system("module load tetoolkit/2.2.1")
 
+# Fetch pipeline info from  config file 
 configfile: "config/config.yml"
 samples = config["samples"].keys()
 genome = config["reference"]["genome_file"]
 annotation = config["reference"]["ensembl_gtf"]
 starOverhang = config["star_db"]["sjdbOverhang"]
 stardb = config["star_db"]["star_dir"]
+te_annot = config["reference"]["te_gtf"]
+strand = config["TEcounts"]["stranded"]
 
 # Build directory structure
 paths = ["data/00ref", "data/00reads", "data/00adapters",
         "results/01trim", "results/02abundant","results/03map_reads",
         "results/04dedup","results/05correlation", "results/05bigwig",
         "results/05counts","results/06fastqc_raw",
-        "results/06fastqc_trim","results/07multiqc"
+        "results/06fastqc_trim","results/07multiqc","results/05TEcount"
         ]
 for path in paths:
     os.makedirs(path,exist_ok = True)
@@ -49,15 +53,8 @@ rule all:
             o3 = expand("results/06fastqc_trim/{s}.1P_fastqc.html", s=samples),
             o4 = expand("results/06fastqc_trim/{s}.2P_fastqc.html", s=samples),
             o7 = "results/07multiqc/multiqc_done.flag",
-            #o8 = "results/05correlation/multiBamSummary.results.npz",
-            o9 = expand("results/05bigwig/{s}.bw", s=samples) #,
-            #o11 = f"{stardb}/stardb_overhang_{starOverhang}"
-            #o12 = expand("results/01trim/{s}.U.fastq.gz", s=samples),
-            #o13 = expand("results/00merged_reads/{s}.R1.fastq.gz", s=samples),
-            #o14 = expand("results/00merged_reads/{s}.R2.fastq.gz", s=samples),
-            #o15 = expand("00map_reads/{s}.", s=samples),
-            #o16 = expand("00abundant/{s}.fastq.1.gz", s=samples),
-            #o17 = expand("00abundant/{s}.fastq.2.gz", s=samples)
+            o9 = expand("results/05bigwig/{s}.bw", s=samples),
+            o10 = expand("results/05TEcount/{s}.TEcount.cntTable", s=samples)
 
 rule merge_rep:
     input: fq1 = get_fq1,
@@ -269,7 +266,7 @@ rule counts:
     threads: 16
     resources:
         cpus_per_task = 16,
-        partition = "norm",
+        partition = "normal",
         time = "14:00:00",
         mem_mb = 32000
     shell:
@@ -279,6 +276,26 @@ rule counts:
          -o {output.counts} {input.bam}
         """
 
+rule TEcount:
+    input: bam = "results/04dedup/{sample}.sorted.dedup.bam",
+           te = f"{te_annot}",
+           annot = f"{annotation}"
+    output: "results/05TEcount/{sample}.TEcount.cntTable"
+    benchmark:
+        "benchmarks/TEcount/TEcount_{sample}.tsv"
+    #threads: 16
+    resources:
+        #cpus_per_task = 16,
+        partition = "quick",
+        #time = "14:00:00",
+        mem_mb = 32000
+    params: f"--format BAM --stranded {strand} --mode multi --sortByPos "
+    shell:
+        """
+        TEcount -b {input.bam} --GTF {input.annot} \
+         --TE {input.te} {params} --project results/05TEcount/{wildcards.sample}.TEcount
+        """
+        
 rule fastqc:
     input: raw1 = "results/00merged_reads/{sample}.R1.fastq.gz",
            raw2 = "results/00merged_reads/{sample}.R2.fastq.gz",
