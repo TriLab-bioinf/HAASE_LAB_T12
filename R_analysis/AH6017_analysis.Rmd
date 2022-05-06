@@ -1,0 +1,597 @@
+---
+title: "AH6017 RNAseq Analysis"
+author: "Hernan Lorenzi"
+date: "4/13/2022"
+output: html_notebook
+---
+
+# Load libraries
+```{r load libraries}
+
+suppressMessages(library("RColorBrewer"))
+suppressMessages(library("org.Hs.eg.db"))
+suppressMessages(library("pheatmap"))
+suppressMessages(library("EnhancedVolcano"))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("ggpubr"))
+suppressMessages(library("DESeq2"))
+suppressMessages(library("stringr"))
+suppressMessages(library("biomaRt"))
+suppressMessages(library("tidyverse"))
+suppressMessages(library("pcaExplorer"))
+suppressMessages(library("VennDiagram"))
+suppressMessages(library("clusterProfiler"))
+suppressMessages(library("GOSemSim"))
+suppressMessages(library("ggsci"))
+```
+
+# Define functions
+```{r aux functions}
+
+source(file = "01_aux_rnaseq_functions.R")
+
+```
+
+
+# Load data
+```{r Loading data}
+all <- read.delim2("data/read_counts.txt", sep = "\t", header = TRUE, row.names = 1)
+
+# Make sure read counts are numeric and rounded to 0 decimals
+all.tmp <- as.data.frame(lapply(all, function(x){ round(as.numeric(x), digits = 0)} ))
+rownames(all.tmp) <- rownames(all)
+all <- all.tmp
+rownames(all) <- str_remove(rownames(all),"[.][0-9]+$")
+
+# Keep table with Ensemble IDs and gene Symbols
+gene_symbols <- replace_gene_acc_by_symbol_ids(rownames(all))
+ensembl_to_symbol <- as.data.frame(cbind("Ensembl_ID" = rownames(all), "gene_name" = gene_symbols), row.names = 1)
+
+# Load metadata
+metadata <- read.delim2("data/metadata.txt", sep = "\t", row.names = 1, header = T)
+
+# Sort tables so metadata and read counts match order
+metadata<-  metadata[match(colnames(all), rownames(metadata)), ]
+
+# Add total read counts and sample id columns to metadata
+metadata <- cbind(metadata, read_counts =colSums(all, na.rm = TRUE), sample_id = rownames(metadata))
+
+#Remove genes with total read counts across all samples <= 20
+all <- remove_all_zero_rows(all, min_total_count = 20)
+
+# Loading gene type info from gencode.v39.primary_assembly.annotation.gtf
+gene_type <- read.delim2("data/gene_type.txt", sep = " ", row.names = 1, header = F)
+rownames(gene_type) <- str_remove(rownames(gene_type),"[.][0-9]+$")
+```
+
+
+# Print distribution of read counts per sample
+```{r}
+dir.create(path = "./Plots", showWarnings = FALSE)
+
+# Plot total reads per sample using barchar
+p <- ggbarplot(data = metadata, 
+          x = "sample_id", 
+          y = "read_counts",
+          x.text.angle = 90,
+          fill = "site", 
+          title = "Total read counts", 
+          ylab = "Read counts",
+          sort.by.groups = TRUE,
+          palette = "jco",
+          sort.val = "asc", 
+          facet.by = "treatment")
+ggsave("Plots/barplot_read_counts.pdf", plot = p)
+p
+```
+
+# Normalize data to TPMs to run some comparative analysis across samples
+```{r}
+all.tpm <- normalize_by_TPM(all)
+```
+
+# Compare Log2FC(nuc/cyto) of treatments vs controls using TPMs
+```{r}
+# Keep genes with meadian TPM > 20 across all samples
+all.tpm.20 <- all.tpm[rowMedians(all.tpm) > 20, ]
+gene_type.20 <- gene_type[match(rownames(all.tpm.20), rownames(gene_type)),]
+log2.dmso <- log(rowMeans(all.tpm.20[,7:9])/rowMeans(all.tpm.20[,1:3]), 2)
+log2.kpt185 <- log(rowMeans(all.tpm.20[,10:12])/rowMeans(all.tpm.20[,4:6]), 2)
+df <- as.data.frame(cbind(Log2dmso = log2.dmso, 
+                          log2kpt185 = log2.kpt185, 
+                          mean_expr = rowMeans(all.tpm.20),
+                          gene_type = gene_type.20,
+                          gene_id = rownames(all.tpm.20)
+                          )
+                    )
+
+# Set numeric fields as numeric
+df$mean_expr <- as.numeric(df$mean_expr)
+df$Log2dmso <- as.numeric(df$Log2dmso)
+df$log2kpt185 <- as.numeric(df$log2kpt185)
+
+# Set all pseudogene gene types as "pseudogene"
+df[grep("pseudogene", df$gene_type),]$gene_type <- 'pseudogene'
+
+# Generate scatter plot
+p1 <- ggplot(df, aes(x=Log2dmso, y=log2kpt185, color=log10(mean_expr))) + 
+  labs(title = "Comparison of Log2FC(nuc/cyto) between kpt185 and dmso treated cells") +
+  geom_point() + geom_abline(slope = 1, intercept = 0, col = "green") + 
+  geom_smooth(se = FALSE) + 
+  theme_minimal()
+
+p2 <- ggplot(df, aes(x=Log2dmso, y=log2kpt185, color=gene_type)) + 
+  labs(title = "Comparison of Log2FC(nuc/cyto) between kpt185 and dmso treated cells") +
+  geom_point() + 
+  geom_smooth(se = FALSE) +
+  geom_abline(slope = 1, intercept = 0, col = "green", size=1, linetype="dashed") +
+  theme_minimal()
+
+
+print(p1)
+print(p2 + scale_color_brewer(palette="Spectral"))
+```
+
+# Compare Log2FC by gene type using TPMs
+```{r}
+gene_type_factors <- unique(df$gene_type)
+for (gt in gene_type_factors){
+  df.subset <- subset(df, gene_type == gt)
+  
+    p3 <- ggplot(df.subset, aes(x=Log2dmso, y=log2kpt185, color=log10(mean_expr), size = mean_expr)) + 
+    labs(title = "Comparison of Log2FC(nuc/cyto) between kpt185 and dmso treated cells", subtitle = paste("Gene type =",gt)) +
+    geom_point() + 
+    geom_smooth(se = TRUE, color = "darkorange") +
+    geom_abline(slope = 1, intercept = 0, col = "green", linetype="dashed", size=1) +
+    theme_minimal() 
+    print(p3)
+}
+```
+Non-coding RNAs that are more abundant in the nucleus compared to the cytoplasm show a drop in their relative nuclear abundance when treated with kpt185. This effect is not observed in protein-coding RNAs.
+
+###########################################
+# Analysis of expression data using DESeq2
+###########################################
+
+```{r deseq2}
+
+# add new factor (group = treatment + site)
+metadata$group <-factor(paste0(metadata$treatment,"_",metadata$site))
+
+# Convert metadata to factors
+for (variable in c("site", "time","treatment", "replicate","sample_id", "group")){
+  metadata[,variable] <- as.factor(metadata[,variable]) 
+}
+
+# add new factor (group = treatment + site)
+metadata$group <-factor(paste0(metadata$treatment,"_",metadata$site))
+
+# Subset samples by treatment
+all.dmso <- all[,metadata$treatment == "dmso"]
+meta.dmso <- metadata[metadata$treatment == "dmso",]
+meta.dmso$group <- as.factor(as.character(meta.dmso$group))
+meta.dmso$treatment <- as.factor(as.character(meta.dmso$treatment))
+meta.dmso$sample_id <- as.factor(as.character(meta.dmso$sample_id))
+
+all.kpt185 <- all[,metadata$treatment == "kpt185"]
+meta.kpt185 <- metadata[metadata$treatment == "kpt185",]
+
+# Create diff expression input matrix for ALL samples
+dds <- DESeqDataSetFromMatrix(countData = all, 
+                              colData = metadata,  
+                              design = ~ treatment + treatment:replicate + treatment:site)
+dds$site <- relevel(dds$site, ref = "cytoplasmic")
+
+# Estimate dispersion and fit model
+dds <- DESeq(dds)
+
+# Get coefs
+resultsNames(dds)
+
+# Make contrasts
+# dmso nuc vs dmso cyto
+res.dmso.name <- results(object = dds, name = "treatmentdmso.sitenuclear")
+# kpt185 nuc vs kpt185 cyto
+res.kpt185.name <- results(object = dds, name = "treatmentkpt185.sitenuclear")
+# nuc/cyt effect in kpt185 vs nuc/cyt effect in dmso
+res.kpt185_vs_dmso.name <- results(object = dds, contrast = list("treatmentkpt185.sitenuclear","treatmentdmso.sitenuclear"))
+
+# Using lfcShrink instead of results to reduce high Log2FC bias of genes with low expression
+# dmso nuc vs dmso cyto
+res.dmso.name.ashr <- lfcShrink(dds = dds, coef = "treatmentdmso.sitenuclear", type = "ashr")
+# kpt185 nuc vs kpt185 cyto
+res.kpt185.name.ashr <- lfcShrink(dds = dds, coef = "treatmentkpt185.sitenuclear", type = "ashr")
+# nuc/cyt effect in kpt185 vs nuc/cyt effect in dmso
+res.kpt185_vs_dmso.name.ashr <- lfcShrink(dds = dds, contrast = list("treatmentkpt185.sitenuclear","treatmentdmso.sitenuclear"), type = "ashr")
+
+
+# WORKING WITH ASHR RESULTS FROM NOW ON
+
+# Add gene type info to results table
+add_gene_type <- function(my_res, my_gt){
+  sorted_gt <- my_gt[match(rownames(my_res), rownames(my_gt)),]
+  my_res$gene_type <- sorted_gt
+  return(my_res)
+}
+
+# Filter out DE genes with LogFC < 1 & FDR <= 0.05 
+res.dmso.name.ashr.filt <- subset(res.dmso.name.ashr, padj < 0.05 & abs(log2FoldChange) >= 1)
+res.kpt185.name.ashr.filt <- subset(res.kpt185.name.ashr, padj < 0.05 & abs(log2FoldChange) >= 1)
+res.kpt185_vs_dmso.name.ashr.filt <- subset(res.kpt185_vs_dmso.name.ashr, padj < 0.05 & abs(log2FoldChange) >= 1)
+
+# Add gene type column to results
+res.dmso.name.ashr <- add_gene_type(res.dmso.name.ashr, gene_type)
+res.kpt185.name.ashr <- add_gene_type(res.kpt185.name.ashr, gene_type)
+res.kpt185_vs_dmso.name.ashr <- add_gene_type(res.kpt185_vs_dmso.name.ashr, gene_type)
+
+# Sort results by Log2FC, add gene symbol and save results to a txt file
+res.dmso.name.ashr.logfc_sorted <- sort_and_write_res_table(res.dmso.name.ashr, "DE_dmsoNuc_vs_dmsoCyto_ashr")
+res.kpt185.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185.name.ashr, "DE_kpt185Nuc_vs_kpt185Cyto_ashr")
+res.kpt185_vs_dmso.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185_vs_dmso.name.ashr, "DE_kpt185_vs_dmso_ashr")
+
+```
+
+# Compare Log2FC
+```{r}
+# Sort res.kpt185.name.ashr.logfc_sorted results based on res.dmso.name.ashr.logfc_sorted order
+res.kpt185.name.ashr.logfc_resorted <- res.kpt185.name.ashr.logfc_sorted[
+                          match(
+                            rownames(res.dmso.name.ashr.logfc_sorted), 
+                            rownames(res.kpt185.name.ashr.logfc_sorted)
+                            ),
+                          ]
+df.tmp <- as.data.frame(cbind(dmso=res.dmso.name.ashr.logfc_sorted$padj, kpt=res.kpt185.name.ashr.logfc_resorted$padj))
+my_min_padj <- apply(df.tmp, 1, function(x) min(x, na.rm = TRUE))
+df <- as.data.frame(cbind(
+                          Log2dmso = res.dmso.name.ashr.logfc_sorted$log2FoldChange, 
+                          log2kpt185 = res.kpt185.name.ashr.logfc_resorted$log2FoldChange, 
+                          mean_expr = res.dmso.name.ashr.logfc_sorted$baseMean,
+                          gene_type = res.dmso.name.ashr.logfc_sorted$gene_type,
+                          gene_id = rownames(res.dmso.name.ashr.logfc_sorted),
+                          gene_name = res.dmso.name.ashr.logfc_sorted$gene_name,
+                          padj = my_min_padj
+                          )
+                    )
+# Convert columns into numeric
+for (variable in c("Log2dmso", "log2kpt185","mean_expr","padj")){
+  df[,variable] <- as.numeric(df[,variable]) 
+}
+
+# Filter out genes with padj > 0.05
+df.subset <- subset(df, padj <= 0.05)
+
+df <- df.subset
+
+# Set all pseudogene gene types as "pseudogene"
+df[grep("pseudogene", df$gene_type),]$gene_type <- 'pseudogene'
+
+# Generate scatter plot
+p1 <- ggplot(df, aes(x=Log2dmso, y=log2kpt185, color=log10(mean_expr))) + 
+  labs(title = "Comparison of Log2FC(nuc/cyto) between kpt185 and dmso treated cells") +
+  geom_point() + geom_abline(slope = 1, intercept = 0, col = "green") + 
+  geom_smooth(se = FALSE) + 
+  theme_minimal()
+
+p2 <- ggplot(df, aes(x=Log2dmso, y=log2kpt185, color=gene_type)) + 
+  labs(title = "Comparison of Log2FC(nuc/cyto) between kpt185 and dmso treated cells") +
+  geom_point() + 
+  geom_smooth(se = FALSE) +
+  geom_abline(slope = 1, intercept = 0, col = "green", size=1, linetype="dashed") +
+  theme_minimal()
+
+
+print(p1)
+print(p2 + scale_color_brewer(palette="Spectral"))
+
+```
+
+# Compare Log2FC by gene type using DESeq2 results
+```{r}
+gene_type_factors <- unique(df$gene_type)
+for (gt in gene_type_factors){
+  df.subset <- subset(df, gene_type == gt)
+  
+    p3 <- ggplot(df.subset, aes(x=Log2dmso, y=log2kpt185, color=log10(mean_expr), size = mean_expr)) + 
+    labs(title = "Comparison of Log2FC(nuc/cyto) between kpt185 and dmso treated cells", subtitle = paste("Gene type =",gt)) +
+    geom_point() + 
+    geom_smooth(se = TRUE, color = "darkorange") +
+    geom_abline(slope = 1, intercept = 0, col = "green", linetype="dashed", size=1) +
+    theme_minimal() 
+    print(p3)
+}
+```
+
+###############################################################################################################################
+###############################################################################################################################
+########################################################     END       ########################################################
+###############################################################################################################################
+###############################################################################################################################
+
+
+
+```{r}
+# Generate DESeq2 object for NS and ST condition ONLY. We could potentially add Read_counts as either a covariate or as a factor (by grouping Read counts into Low and High count bins). Ideally, this should be done adding Read_counts as a random effect using mixed models, that can only be applied in Limma package. Addind it as a fixed effect in the fdesign formula might lower the power of the analysis.  
+
+
+dds <- DESeqDataSetFromMatrix(countData = all, 
+                              colData = metadata,  
+                              design = ~ site + treatment + Genotype:Inducer)
+
+# Plot total reads per sample using barchar
+p <- ggbarplot(data = meta_one, 
+          x = "Sample_id", 
+          y = "Read_counts",
+          x.text.angle = 90,
+          fill = "Inducer", 
+          title = "Total read counts", 
+          ylab = "Read counts",
+          sort.by.groups = TRUE,
+          palette = "jco",
+          sort.val = "asc", 
+          facet.by = "Genotype")
+ggsave("Plots/barplot_read_counts.pdf", plot = p)
+p
+
+
+# Normalize counts
+vsd.one <- vst(dds.one, blind=FALSE)
+rlog.one <- rlog(dds.one, blind=FALSE)
+
+# Calculate distances between samples
+sampleDists <- dist(t(assay(vsd.one)))
+
+# Plot inter-sample distances
+old.par <- par(no.readonly=T)
+
+library("RColorBrewer")
+sampleDistMatrix <- as.matrix(sampleDists)
+rownames(sampleDistMatrix) <- paste(rlog.one$Sequencing_pool, rlog.one$Genotype, rlog.one$Inducer, sep="-")
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+
+# PCA
+pcaData <- plotPCA(rlog.one, intgroup=c("Genotype", "Inducer"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+y.coords = c(min(pcaData$PC1, pcaData$PC2), max(pcaData$PC1, pcaData$PC2))
+x.coords = y.coords
+p1 <- ggplot(pcaData, aes(PC1, PC2, color=Genotype, shape=Inducer)) +
+  geom_point(size=3) + scale_color_lancet() + theme(panel.grid = element_blank(), panel.background = element_rect(fill = 'white'), panel.border = element_line(colour = "black")) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed(ratio = (max(pcaData$PC1)-min(pcaData$PC1))/(max(pcaData$PC2)-min(pcaData$PC2))) 
+
+ggsave("Plots/pca_dataset_1_Induc_gt.pdf", plot = p1)
+p1
+
+pcaData <- plotPCA(rlog.one, intgroup=c("Read_counts", "Inducer"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+p2 <- ggplot(pcaData, aes(PC1, PC2, color=Read_counts, shape=Inducer)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed(ratio = (max(pcaData$PC1)-min(pcaData$PC1))/(max(pcaData$PC2)-min(pcaData$PC2))) + scale_color_gradient2(high = "blue", mid = "yellow")
+p2
+ggsave("Plots/pca_dataset_1_Induc_read_counts.pdf", plot = p2)
+```
+
+### resultsNames(dds)
+
+# Filtering out poorly-expressed genes (less than 20 reads across all samples) 
+```{r filtering genes based on total counts of reads}
+
+# Keep genes with at least 10 reads total across samples
+keep <- rowSums(counts(dds.one)) >= 20
+dds.one <- dds.one[keep,]
+
+```
+
+
+# DE analysis using contrasts and a paired design
+
+```{r}
+# add new factor (group = treatment + site)
+metadata$group <-factor(paste0(metadata$treatment,"_",metadata$site))
+
+# Subset samples by treatment
+all.dmso <- all[,metadata$treatment == "dmso"]
+meta.dmso <- metadata[metadata$treatment == "dmso",]
+meta.dmso$group <- as.factor(as.character(meta.dmso$group))
+meta.dmso$treatment <- as.factor(as.character(meta.dmso$treatment))
+meta.dmso$sample_id <- as.factor(as.character(meta.dmso$sample_id))
+
+all.kpt185 <- all[,metadata$treatment == "kpt185"]
+meta.kpt185 <- metadata[metadata$treatment == "kpt185",]
+
+# Create diff expression input matrix
+dds <- DESeqDataSetFromMatrix(countData = all, 
+                              colData = metadata,  
+                              design = ~ replicate + group)
+dds$site <- relevel(dds$site, ref = "cytoplasmic")
+
+# Estimate dispersion and fit model
+dds <- DESeq(dds)
+
+#dds.one$Group_gt_ind <- factor(paste0(dds.one$Genotype, dds.one$Inducer))
+#design(dds.one) <- ~ Group_gt_ind
+
+# Make contrasts
+res.dmso <- results(dds, contrast = c("group", "dmso_nuclear", "dmso_cytoplasmic"))
+res.kpt185 <- results(dds, contrast = c("group", "kpt185_nuclear", "kpt185_cytoplasmic"))
+
+# Filter out DE genes with LogFC < 1 & FDR <= 0.05 
+res.dmso.filt <- subset(res.dmso, padj < 0.05 & abs(log2FoldChange) >= 1)
+res.kpt185.filt <- subset(res.kpt185, padj < 0.05 & abs(log2FoldChange) >= 1)
+
+# Using lfcShrink instead of results to reduce high Log2FC bias of genes with low expression
+res_wtIC_vs_wtNone <- lfcShrink(dds.one, contrast = c("Group_gt_ind", "WTpolyIC", "WTNone" ), type = "ashr")
+res_koIC_vs_koNone <- lfcShrink(dds.one, contrast = c("Group_gt_ind", "RNaseL_KOpolyIC", "RNaseL_KONone" ), type = "ashr")
+res_wt25A_vs_wtNone <- lfcShrink(dds.one, contrast = c("Group_gt_ind", "WT25A", "WTNone" ), type = "ashr")
+res_ko25A_vs_koNone <- lfcShrink(dds.one, contrast = c("Group_gt_ind", "RNaseL_KO25A", "RNaseL_KONone" ), type = "ashr")
+
+
+
+
+# Sort results by Log2FC
+res_wtIC_vs_wtNone.logfc_sorted <- sort_and_write_res_table(res_wtIC_vs_wtNone, "DE_wtIC_vs_wtNone")
+res_koIC_vs_koNone.logfc_sorted <- sort_and_write_res_table(res_koIC_vs_koNone, "DE_koIC_vs_koNone")
+res_wt25A_vs_wtNone.logfc_sorted <- sort_and_write_res_table(res_wt25A_vs_wtNone, "DE_wt25A_vs_wtNone")
+res_ko25A_vs_koNone.logfc_sorted <- sort_and_write_res_table(res_ko25A_vs_koNone, "DE_ko25A_vs_koNone")
+
+# Save sorted files as a list
+DE_results = list()
+DE_results[["wtIC_vs_wtNone"]]  <- res_wtIC_vs_wtNone.logfc_sorted
+DE_results[["koIC_vs_koNone"]] <- res_koIC_vs_koNone.logfc_sorted
+DE_results[["wt25A_vs_wtNone"]] <- res_wt25A_vs_wtNone.logfc_sorted
+DE_results[["ko25A_vs_koNone"]] <- res_ko25A_vs_koNone.logfc_sorted
+
+# Generate result table of DE genes in  res_wtIC_vs_wtNone but not in res_koIC_vs_koNone
+# or in res_wt25A_vs_wtNone. 
+# This are genes that might require both an induction via dsRNA/DNA and a functional RNAseL
+
+res_wtIC_vs_wtNone.sig <- rownames(res_wtIC_vs_wtNone)[res_wtIC_vs_wtNone$padj <= 0.05 & !is.na(res_wtIC_vs_wtNone$padj)]
+res_koIC_vs_koNone.sig <- rownames(res_koIC_vs_koNone)[res_koIC_vs_koNone$padj <= 0.05 & !is.na(res_koIC_vs_koNone$padj)]
+res_wt25A_vs_wtNone.sig <- rownames(res_wt25A_vs_wtNone)[res_wt25A_vs_wtNone$padj <= 0.05 & !is.na(res_wt25A_vs_wtNone$padj)]
+filtered_ids <- res_wtIC_vs_wtNone.sig[!(res_wtIC_vs_wtNone.sig %in% unique(res_wt25A_vs_wtNone.sig, res_koIC_vs_koNone.sig))]
+res_wtIC_vs_wtNone.filtered <- subset(res_wtIC_vs_wtNone, rownames(res_wtIC_vs_wtNone) %in% filtered_ids)
+# Save res_wtIC_vs_wtNone.filtered object in list
+DE_results[["wtIC_vs_wtNone_KOns_25Ans"]] <- res_wtIC_vs_wtNone.filtered
+
+print("WT-polyIC vs WT-None")
+summary(res_wtIC_vs_wtNone.logfc_sorted)
+print("KO-polyIC vs KO-None")
+summary(res_koIC_vs_koNone.logfc_sorted)
+print("WT-25A vs WT-None")
+summary(res_wt25A_vs_wtNone.logfc_sorted)
+print("KO-25A vs KO-None")
+summary(res_ko25A_vs_koNone.logfc_sorted)
+
+# Genes significantly DE in WT and induced by polyIC
+wt.g <- rownames(res_wtIC_vs_wtNone.logfc_sorted[!is.na(res_wtIC_vs_wtNone.logfc_sorted$padj) & res_wtIC_vs_wtNone.logfc_sorted$padj < 0.05,])
+# Genes significantly DE in KO and induced by polyIC
+ko.g <- rownames(res_koIC_vs_koNone.logfc_sorted[!is.na(res_koIC_vs_koNone.logfc_sorted$padj) & res_koIC_vs_koNone.logfc_sorted$padj < 0.05,])
+# Genes significantly DE in WT and induced by 25A
+wt.25A.g <- rownames(res_wt25A_vs_wtNone.logfc_sorted[!is.na(res_wt25A_vs_wtNone.logfc_sorted$padj) & res_wt25A_vs_wtNone.logfc_sorted$padj < 0.05,])
+# Genes significantly DE in KO and induced by 25A
+ko.25A.g <- rownames(res_ko25A_vs_koNone.logfc_sorted[!is.na(res_ko25A_vs_koNone.logfc_sorted$padj) & res_ko25A_vs_koNone.logfc_sorted$padj < 0.05,])
+
+# Plot Venn Diagram with DE gene overlaps among treatments.
+VennDiagram::venn.diagram(x = list(wt.g, ko.g, wt.25A.g ),
+  category.names = c("WT_plyI:C", "KO_polyI:C", "WT_25A"),
+  filename = "Inducer_DE_venn.png",
+  imagetype = "png",
+  output=TRUE,
+  height = 480 , 
+  width = 480 , 
+  resolution = 300,
+  compression = "lzw",
+  lwd = 1,
+  col=c("#440154ff", '#21908dff', '#fde725ff'),
+  fill = c(alpha("#440154ff",0.3), alpha('#21908dff',0.3), alpha('#fde725ff',0.3)),
+  cex = 0.5,
+  fontfamily = "sans",
+  cat.cex = 0.3,
+  cat.default.pos = "outer",
+  cat.pos = c(-27, 27, 135),
+  cat.dist = c(0.055, 0.055, 0.085),
+  cat.fontfamily = "sans",
+  #cat.col = c("#440154ff", '#21908dff', '#fde725ff'),
+  rotation = 1
+)
+
+# Select factors to be displayed together with the expression data
+df.ns <- as.data.frame(colData(dds.one)[,c("Genotype","Inducer")])
+# plot_heat_map
+plot_heat_map(my_vstd = vsd.one, gene_list = wt.25A.g, file_name = "Plots/25A_wt", variables = df.ns)
+plot_heat_map(my_vstd = vsd.one, gene_list = wt.g[1:50], file_name = "Plots/polyIC_wt", variables = df.ns)
+
+# Genes significantly DE in WT and not KO when induced by polyIC
+wt_no_ko.g <- wt.g[!wt.g %in% ko.g]
+# Genes significantly DE in KO and not WT when induced by polyIC
+ko_no_wt.g <- ko.g[!ko.g %in% wt.g]
+# Genes significantly DE in WT and not KO when induced by 25A
+wt_no_ko.25A.g <- wt.25A.g[!wt.25A.g %in% ko.25A.g]
+# Genes significantly DE in KO and not WT when induced by 25A
+ko_no_wt.25A.g <- ko.25A.g[!ko.25A.g %in% wt.25A.g]
+
+
+# Results df wihth genes DE in WT but not in KO
+res_wtIC_vs_wtNone_no_ko <- res_wtIC_vs_wtNone.logfc_sorted[wt_no_ko.g, ]
+res_wt25A_vs_wtNone_no_ko <- res_wt25A_vs_wtNone.logfc_sorted[wt_no_ko.25A.g,]
+x <- sort_and_write_res_table(res_wtIC_vs_wtNone_no_ko, file_name = "res_wtIC_vs_wtNone_no_ko")
+x <- sort_and_write_res_table(res_wt25A_vs_wtNone_no_ko, file_name = "res_wt25A_vs_wtNone_no_ko")
+
+# Plot genes with most up and down regulation with each inducer
+genes_of_interest = c("ENSG00000185745","ENSG00000135114",
+"ENSG00000115267","ENSG00000119922","ENSG00000119917",
+"ENSG00000107201","ENSG00000171855","ENSG00000183709",
+"ENSG00000134321","ENSG00000185507","ENSG00000169429",
+"ENSG00000108771","ENSG00000155918","ENSG00000182393",
+"ENSG00000111335","ENSG00000197110","ENSG00000120738",
+"ENSG00000087074","ENSG00000105939","ENSG00000136244",
+"ENSG00000115415","ENSG00000167978","ENSG00000144802",
+"ENSG00000159140","ENSG00000136997","ENSG00000081041",
+"ENSG00000147604","ENSG00000253729","ENSG00000144895",
+"ENSG00000083857","ENSG00000087086","ENSG00000111640",
+"ENSG00000109971","ENSG00000198886","ENSG00000184009",
+"ENSG00000075624","ENSG00000161980")
+
+genes_of_interest_symbols <- ensembl_to_symbol$gene_name[ensembl_to_symbol$Ensembl_ID %in% genes_of_interest]
+
+print("Expression of genes of interest")
+for (gene in  genes_of_interest){
+  p <- print_gene_expression(dds.one, 
+                             gene, 
+                             ensembl_to_symbol[ensembl_to_symbol$Ensembl_ID == gene,2]
+                             )
+  print(p)
+}
+```
+
+```{r volcano plots}
+# Print volcano plots for eahc condition
+generate_volcano_plot_with_ids(res.tmp = res_wtIC_vs_wtNone, my_file_name = "res_wtIC_vs_wtNone.logfc_sorted", gene_list = genes_of_interest_symbols)
+generate_volcano_plot_with_ids(res_koIC_vs_koNone, my_file_name = "res_koIC_vs_koNone.logfc_sorted", gene_list = genes_of_interest_symbols)
+generate_volcano_plot_with_ids(res_wt25A_vs_wtNone, my_file_name = "res_wt25A_vs_wtNone.logfc_sorted", gene_list = genes_of_interest_symbols)
+generate_volcano_plot_with_ids(res_ko25A_vs_koNone, my_file_name = "res_ko25A_vs_koNone.logfc_sorted", gene_list = genes_of_interest_symbols)
+
+```
+
+
+#################################
+## Gene / GO enrichment analysis
+#################################
+
+```{r GO enrichment}
+# The code below selects a list of gene IDs based on a specific Log2FC cutoff for running Overrepresentation analysis with the R function 'enricher'. The list of genes are stored in the variable "gene" for gene IDs = Ensembl gene IDs, and in the variable  'gene.entrezid' for a list of Entrez gene IDs. Usually, geneset databases use eithr Entrez gene IDs or gene symbols as identifiers, so in some cases it is handy to count with a list of genes using Entrez gene IDs. 
+
+#The same code also extract the entire list of genes used for the Differential Expression Analysis as an R list element, using Ensemble gene IDs as keys (names) and Log2FC as values. This geneList is used as input for running Gene Set Enrichment Analysis with the function 'GSEA'. If needed, the code below also generates the same geneList but using Entrez gene IDs as keys.
+
+ggo = list()
+go.enr = list()
+
+for (i in names(DE_results)){
+  for (ontho in c("BP", "MF", "CC")){ 
+    my_id = paste0(i,"_",ontho)
+    ggo[[my_id]] <- go_overrep(geneList = DE_results[[i]], 
+                             my_file = paste0("./GO/", i), 
+                             onthology = ontho)
+    
+    go.enr[[my_id]] <- go_enrichment(geneList = DE_results[[i]], 
+                                   my_file = paste0("./GO/", i), 
+                                   onthology = ontho)
+  }
+}
+
+dotplot(go.enr[["wtIC_vs_wtNone_BP"]], showCategory=30)
+mutate(go.enr[["wtIC_vs_wtNone_BP"]], qscore = -log(p.adjust, base=10)) %>% 
+    barplot(x="qscore")
+```
+
+
+```{r}
+sessionInfo()
+```

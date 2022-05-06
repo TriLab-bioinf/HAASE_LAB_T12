@@ -1,0 +1,8 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+results/
+R_analysis/DE/
+R_analysis/ClusterProfiler/
+R_analysis/Plots/
