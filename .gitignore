@@ -3,6 +3,17 @@
 .RData
 .Ruserdata
 results/
+coverage/
 R_analysis/DE/
 R_analysis/ClusterProfiler/
 R_analysis/Plots/
+R_analysis/AH6017_analysis.nb.html
+.DS_Store
+R_analysis/.DS_Store
+R_analysis/AH6017_analysis_v2.pdf
+R_analysis/Coverage_analysis.nb.html
+R_analysis/Prelim_Results_05_05_2022.pptx
+R_analysis/data/
+R_analysis/gencode.v39.primary_assembly.annotation.gtf
+R_analysis/tmp.txt
+R_analysis/~$Prelim_Results_05_05_2022.pptx
