@@ -1,7 +1,8 @@
 # Snakemake pipeline for processing bulk RNAseq sequencing data
 
 ## To load conda environment and install required tools
-mamba env create -f=environment_bbtools.yml -n rnaseq
+mamba env create -f=environment.yml -n rnaseq
+
 conda activate rnaseq
 
 ## Run entire pipeline
