@@ -107,7 +107,12 @@ run_overrepresentation_analysis <- function(gene_set, genes,
 }
 
 # Function for enrichment analysis (ONLY FOR HUMAN GENES SO FAR)
-run_enrichment_analysis <- function(gene_set, geneList, analysis_name = "dds.result", gs_name = "MSigDB", adj_p_cutoff = 0.05, type = "general"){
+run_enrichment_analysis <- function(gene_set, geneList, 
+                                    analysis_name = "dds.result", 
+                                    gs_name = "MSigDB", 
+                                    adj_p_cutoff = 0.05, 
+                                    type = "general"){
+  
   # Inputs: gene_set=Gene set from MSigDB, 
   # geneList=a list with ensembl_ids as names and decremented order of Log2FCs as values
   # analysis_name=prefix describing DE comparison for output file names
@@ -266,4 +271,286 @@ run_enrichment_analysis <- function(gene_set, geneList, analysis_name = "dds.res
     #print(p14)
     #print(p16)
   }
+}
+
+go_overrep <- function(dds_res, my_file, golevel = 3, 
+                       onthology = "BP", qvalue = 0.05, 
+                       fdr = 0.05, log2FC_cutoff = 0){
+  
+  # Check if dds_res is empty and return if that is the case
+  if(dim(dds_res)[2] == 0){ return('')}
+  
+  # Output directory
+  my_path = paste0("./GO/",my_file,"/")
+  
+  # Save Log2FC vals in log2fc_symb.df using gene symbols as IDs. 
+  log2fc_symb.df <- as.data.frame(dds_res[,c("log2FoldChange","padj")])
+  log2fc_symb.df$symbols <- replace_gene_acc_by_symbol_ids(rownames(log2fc_symb.df),
+                                                           return_all = TRUE)
+  
+  # Convert Ensembl IDs to EntrezIDs
+  rownames(dds_res) <- replace_gene_acc_by_gb_ids(rownames(dds_res),
+                                                  return_all = TRUE)
+  # Discard genes missing Entrez Gene IDs
+  keep <- grep('ENSG', rownames(dds_res), invert = TRUE)
+  dds_res <- dds_res[keep,]
+  
+  geneList.filtered <- rownames(dds_res)[abs(dds_res$log2FoldChange) > log2FC_cutoff 
+                                         & dds_res$padj < qvalue]
+  
+  # Check if dds_res is empty and return if that is the case
+  if(length(geneList.filtered) == 0){ return('')}
+  
+  ego <- enrichGO(gene = geneList.filtered,
+                  OrgDb= "org.Hs.eg.db",
+                  ont = onthology, # Either MF, BP, CC or ALL
+                  pAdjustMethod = "BH",
+                  qvalueCutoff  = fdr,
+                  keyType = 'ENTREZID',
+                  readable      = TRUE,
+                  minGSSize = 10,
+                  maxGSSize = 500
+  )
+  write.table(ego, file = paste0(my_path,"GO_OVERREP.",onthology,".",my_file,".txt"), sep = "\t", col.names=NA)
+  
+  # Network plots and tree plots for all, up and downregulated pathways
+  if(dim(ego)[1] > 1){ # We need at least 2 nodes for a network or tree plot
+    distance_matrix <- pairwise_termsim(ego, showCategory = 400)
+    
+    # Get median Log2FC per identified pathway
+    my_median_log2fc <- c()
+    for (g in distance_matrix@result$geneID){
+      g.vec <- strsplit(g, "/")[[1]]
+      log2fc.median <- median(subset(log2fc_symb.df, log2fc_symb.df$symbols %in% g.vec)[,"log2FoldChange"])
+      my_median_log2fc <- c(my_median_log2fc,log2fc.median)
+    }
+    # Add median Log2FC column
+    if(length(my_median_log2fc) == 0){my_median_log2fc <- 0}
+    distance_matrix@result$median.log2fc <- my_median_log2fc
+    
+    # Network plot
+    p6 <- emapplot(distance_matrix, 
+                   repel = T, 
+                   showCategory = 200, 
+                   legend_n = 5, 
+                   min_edge = 0.4 , 
+                   color = "median.log2fc", 
+                   cex_label_category = 0.4,
+                   node_label = "category", label_format = 20)
+    ggsave2(filename = paste0(my_path,"GO_OVERREP.",onthology,".",my_file,"_network.pdf"), 
+            plot = p6, width = 11, height = 8)
+    
+    # Treeplots
+    number_of_categories = min(80, as.vector(table(distance_matrix@result$p.adjust < 0.05)[['TRUE']]))
+    p12 <- treeplot(distance_matrix, showCategory = 80, 
+                    nCluster = 2 * sqrt(number_of_categories), 
+                    color = "median.log2fc", nWords = 0)
+    ggsave2(filename = paste0(my_path,"GO_OVERREP.",onthology,".",my_file,"_tree.pdf"), 
+            plot = p12, width = 11, height = 8 * (number_of_categories/40))
+    
+    print(p6)
+    print(p12)
+  }
+  
+  return(ego)
+}
+
+go_classification <- function(dds_res, my_file, golevel = 3, onthology = "BP", log2FC_cutoff = 0, alpha = 1){
+  
+  # Output directory
+  my_path = paste0("./GO/",my_file,"/")
+  
+  # Convert Ensembl IDs to EntrezIDs
+  rownames(dds_res) <- replace_gene_acc_by_gb_ids(rownames(dds_res),
+                                                  return_all = TRUE)
+  # Discard genes missing Entrez Gene IDs
+  keep <- grep('ENSG', rownames(dds_res), invert = TRUE)
+  dds_res <- dds_res[keep,]
+  
+  geneList.filtered <- rownames(dds_res)[abs(dds_res$log2FoldChange) >= log2FC_cutoff & dds_res$padj <= alpha]
+  
+  print(paste( "Total number of Entrez gene IDs = ",length(geneList.filtered)))
+  
+  ggo <- groupGO(gene     = geneList.filtered,
+                 OrgDb    = "org.Hs.eg.db",
+                 ont      = onthology,  # Either MF, BP or CC
+                 level    = golevel, # The higher the number, the more specific the GO terms.
+                 readable = TRUE, # if readable is TRUE, the gene IDs will mapping to gene symbols.
+                 keyType = 'ENTREZID'
+  )
+  write.table(ggo, file = paste0(my_path,"GO_CLASSIF.",onthology,".",my_file,".txt"), sep = "\t",col.names=NA)
+  
+  return(ggo)
+}
+
+go_gsea <- function(dds_res, my_file, golevel = 3, 
+                    onthology = "BP", qvalue = 0.05, 
+                    fdr = 0.05){
+  
+  # Check if dds_res is empty and return if that is the case
+  if(dim(dds_res)[2] == 0){ return('')}
+  
+  # Skip analysis if there are no genes with padj < 0.05
+  geneList.filtered <- rownames(dds_res)[abs(dds_res$log2FoldChange) > log2FC_cutoff 
+                                         & dds_res$padj < qvalue]
+  
+  # Check if dds_res is empty and return if that is the case
+  if(length(geneList.filtered) == 0){ return('')}
+  
+  # Output directory
+  my_path = paste0("./GO/",my_file,"/")
+  
+  # Convert Ensembl IDs to EntrezIDs
+  rownames(dds_res) <- replace_gene_acc_by_gb_ids(rownames(dds_res),
+                                                  return_all = TRUE)
+  # Discard genes missing Entrez Gene IDs
+  keep <- grep('ENSG', rownames(dds_res), invert = TRUE)
+  dds_res <- dds_res[keep,]
+  
+  # Sort genes by Log2FC (decreasing order)
+  geneList = list()
+  dds_res.sorted <- dds_res[order(dds_res$log2FoldChange, decreasing = TRUE ), ]
+  geneList <- dds_res.sorted$log2FoldChange
+  names(geneList) <- rownames(dds_res.sorted)
+  
+  go.gsea <- gseGO(gene = geneList,
+                   OrgDb= "org.Hs.eg.db",
+                   ont = onthology, # Either MF, BP, CC or ALL
+                   pAdjustMethod = "BH",
+                   pvalueCutoff  = fdr,
+                   keyType = 'ENTREZID',
+                   minGSSize = 10,
+                   maxGSSize = 500,
+                   eps = 0
+  )
+  go.gsea.gs <- setReadable(go.gsea , org.Hs.eg.db, keyType = "ENTREZID")
+  write.table(go.gsea.gs, file = paste0(my_path,"GO_GSEA.",onthology,".",my_file,".txt"), sep = "\t", col.names=NA)
+  
+  # Generate plots summarizing enrichment results (You might need to tweak the height and width parameters of the plot to make it fit within the page limits and look nice, otherwise it might shrink to fit within the page)
+  
+  if(length(go.gsea.gs@result$NES) > 0){
+    
+    # Upset plots
+    # filter out signatures with NES < 0 
+    go.gsea_bt_0 <- filter(go.gsea.gs, NES > 0) # filter out signatures with NES < 0
+    go.gsea_lt_0 <- filter(go.gsea.gs, NES < 0) # filter out signatures with NES < 0
+    
+    if(dim(go.gsea_bt_0@result)[1] > 0){
+      p_ups_up <- upsetplot(go.gsea_bt_0, n=10) + scale_x_upset(n_intersections = 30) 
+      ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_UP_upset_plot.pdf"), 
+              plot = p_ups_up, width = 22, 
+              height = 4 * (max(2,min(36, length(go.gsea_bt_0@result$ID))/15)))
+    }
+    if(dim(go.gsea_lt_0@result)[1] > 0){
+      p_ups_down <- upsetplot(go.gsea_lt_0, n=36) + scale_x_upset(n_intersections = 30) 
+      ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_DOWN_upset_plot.pdf"), 
+              plot = p_ups_down, width = 22, 
+              height = 4 * (max(2,min(36, length(go.gsea_lt_0@result$ID))/15)))
+    }
+    # Dotplot
+    p2 <- dotplot(go.gsea.gs, showCategory=36, 
+                  font.size = 7, 
+                  color = "p.adjust", 
+                  label_format = 100) + 
+      ggtitle(paste0(my_prefix," dotplot for GSEA"))
+    
+    ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_dotplot.pdf"), 
+            plot = p2, width = 15, height = 8)
+    
+    # Barplot
+    p4 <- draw_GSEA_barplot(my_gsea_obj =  go.gsea.gs, my_pathway_counts = 36, 
+                            file_name_prefix = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_barplot"), 
+                            my_width = 11, 
+                            my_height =11
+    )
+    
+    # Network plots and tree plots for all, up and downregulated pathways
+    if(dim(go.gsea.gs)[1] > 1){ # We need at least 2 nodes for a network or tree plot
+      distance_matrix <- pairwise_termsim(go.gsea.gs, showCategory = 400)
+      
+      # Network plot
+      p6 <- emapplot(distance_matrix, 
+                     repel = T, 
+                     showCategory = 200, 
+                     legend_n = 5, 
+                     min_edge = 0.2 , 
+                     color = "NES", 
+                     cex_label_category = 0.4,
+                     node_label = "category", label_format = 20)
+      ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_network.pdf"), 
+              plot = p6, width = 11, height = 8)
+      
+      # Treeplots
+      number_of_categories = min(80, as.vector(table(distance_matrix@result$p.adjust < 0.05)[['TRUE']]))
+      p12 <- treeplot(distance_matrix, showCategory = 80, 
+                      nCluster = 2 * sqrt(number_of_categories), 
+                      color = "NES", nWords = 0)
+      ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_tree.pdf"), 
+              plot = p12, width = 11, height = 8 * (number_of_categories/40))
+    }
+    
+    if(dim(go.gsea_bt_0)[1] > 1){ # We need at least 2 nodes for a network or tree plot
+      distance_matrix.up <- pairwise_termsim(go.gsea_bt_0, showCategory = 400)
+      
+      # Network plot
+      p8 <- emapplot(distance_matrix.up, 
+                     repel = T, 
+                     showCategory = 200, 
+                     legend_n = 5, 
+                     min_edge = 0.2 , 
+                     color = "NES", 
+                     cex_label_category = 0.4,
+                     node_label = "category", label_format = 20)
+      ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_network_UP.pdf"), 
+              plot = p8, width = 11, height = 8)
+      
+      # Treeplots
+      number_of_categories.up = min(80, length(distance_matrix.up@result$ID))
+      p14 <- treeplot(distance_matrix.up, showCategory = 80, 
+                      nCluster = 2 * sqrt(number_of_categories.up), 
+                      color = "NES", nWords = 0)
+      ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_tree_UP.pdf"), 
+              plot = p14, width = 11, height = 8 * (number_of_categories.up/40))
+      
+    }
+    
+    if(dim(go.gsea_lt_0)[1] > 1){ # We need at least 2 nodes for a network or tree plot
+      distance_matrix.down <- pairwise_termsim(go.gsea_lt_0, showCategory = 400)
+      
+      # Network plot
+      p10 <- emapplot(distance_matrix.down, 
+                      repel = T, 
+                      showCategory = 200, 
+                      legend_n = 5, 
+                      min_edge = 0.2 , 
+                      color = "NES", 
+                      cex_label_category = 0.4,
+                      node_label = "category", label_format = 20)
+      ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_network_DOWN.pdf"), 
+              plot = p10, width = 11, height = 8)
+      
+      # Treeplots
+      number_of_categories.down = min(80, length(distance_matrix.down@result$ID))
+      p16 <- treeplot(distance_matrix.down, showCategory = 80, 
+                      nCluster = 2 * sqrt(number_of_categories.down), 
+                      color = "NES", nWords = 0)
+      ggsave2(filename = paste0(my_path,"GSEA_GO.",onthology,".",my_file,"_tree_DOWN.pdf"), 
+              plot = p16, width = 11, height = 8 * (number_of_categories.down/40))
+      
+    }
+    
+    print(p2)
+    print(p4)
+    print(p_ups_up)
+    print(p_ups_down)
+    print(p6)
+    print(p8)
+    print(p10)
+    print(p12)
+    print(p14)
+    print(p16)
+    
+    #return(go.gsea.gs)
+  }  
+  return(go.gsea.gs)
 }
