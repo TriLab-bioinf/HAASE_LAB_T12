@@ -7,6 +7,7 @@ coverage/
 R_analysis/DE/
 R_analysis/ClusterProfiler/
 R_analysis/Plots/
+R_analysis/GO/
 R_analysis/AH6017_analysis.nb.html
 .DS_Store
 R_analysis/.DS_Store

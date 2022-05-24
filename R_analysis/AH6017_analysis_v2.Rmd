@@ -39,7 +39,7 @@ suppressMessages(library("cowplot"))
 ```{r aux functions}
 
 source(file = "01_aux_rnaseq_functions.R")
-
+source(file = "02_Gene_enrichment_functions.R")
 ```
 
 
@@ -281,6 +281,13 @@ res.dmso.name.ashr.logfc_sorted <- sort_and_write_res_table(res.dmso.name.ashr, 
 res.kpt185.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185.name.ashr, "DE_kpt185Nuc_vs_kpt185Cyto_ashr")
 res.kpt185_vs_dmso.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185_vs_dmso.name.ashr, "DE_kpt185_vs_dmso_ashr")
 
+# Save sorted files as a list
+DE_results = list()
+DE_results[["dmso_nuc_vs_dmso_cyt"]]  <- res.dmso.name.ashr.logfc_sorted
+DE_results[["kpt185_nuc_vs_kpt185_cyt"]]  <- res.kpt185.name.ashr.logfc_sorted
+DE_results[["kpt185_nuc_cyt_vs_dmso_nuc_cyt"]]  <- res.kpt185_vs_dmso.name.ashr.logfc_sorted
+
+
 ```
 
 # Compare Log2FC
@@ -505,64 +512,218 @@ my_prefix_down <- "kpt185_vs_dmso_DOWN"
   # Run Gene Set Enrichment Analysis
   run_enrichment_analysis(gene_set = msig_c2_reactome, geneList = geneList, analysis_name = my_prefix, gs_name = "C2_CP_REACTOME", type = "reactome")
 ```
+
 #################################
-## Gene / GO enrichment analysis
+# Gene / GO enrichment analysis
+#################################
+
+```{r GO enrichment analysis}
+# The code below selects a list of gene IDs based on a specific Log2FC cutoff for running Overrepresentation analysis with the R function 'enricher'. The list of genes are stored in the variable "gene" for gene IDs = Ensembl gene IDs, and in the variable  'gene.entrezid' for a list of Entrez gene IDs. Usually, geneset databases use eithr Entrez gene IDs or gene symbols as identifiers, so in some cases it is handy to count with a list of genes using Entrez gene IDs. 
+#The same code also extract the entire list of genes used for the Differential Expression Analysis as an R list element, using Ensemble gene IDs as keys (names) and Log2FC as values. This geneList is used as input for running Gene Set Enrichment Analysis with the function 'GSEA'. If needed, the code below also generates the same geneList but using Entrez gene IDs as keys.
+go.class = list()
+go.overrep = list()
+go.gsea = list()
+for (i in names(DE_results)){
+ 
+  dir.create(path = paste0("./GO/", i), showWarnings = FALSE, recursive = TRUE)
+  for (ontho in c("BP", "MF", "CC")){ 
+    my_id = paste0(i,"_",ontho)
+    
+    print(paste("go_classification", i, ontho))
+    go.class[[my_id]] <- go_classification(dds_res = DE_results[[i]], 
+                             my_file = i, 
+                             onthology = ontho)
+    
+    print(paste("go_overrep", i, ontho))
+    go.overrep[[my_id]] <- go_overrep(dds_res = DE_results[[i]], 
+                                   my_file = i, 
+                                   onthology = ontho)
+    
+    print(paste("go_gsea", i, ontho))
+    go.gsea[[my_id]] <- go_gsea(dds_res = DE_results[[i]], 
+                                   my_file = i, 
+                                   onthology = ontho)
+  }
+}
+
+```
+
+#########################################################
+# Compare kpt185 vs dmso for each cell compartment
+#########################################################
+
+```{r kpt185 vs dmso}
+# Create diff expression input matrix for ALL samples to do within cell compartment (wcc) DE
+dds.wcc <- DESeqDataSetFromMatrix(countData = all, 
+                              colData = metadata,  
+                              design = ~ group)
+dds.wcc$group <- relevel(dds.wcc$group, ref = "dmso_cytoplasmic")
+
+# Estimate dispersion and fit model
+dds.wcc <- DESeq(dds.wcc)
+
+# Get coefs
+resultsNames(dds.wcc)
+
+# Make contrasts
+
+  # kpt185 cytoplasmic vs dmso cytoplasmic
+  res.kpt185_dmso.cyto.name.ashr <- lfcShrink(dds = dds.wcc, coef =  "group_kpt185_cytoplasmic_vs_dmso_cytoplasmic", type = "ashr")
+  
+  # kpt185 nuclear vs dmso nuclear
+  dds.wcc$group <- relevel(dds.wcc$group, ref = "dmso_nuclear")
+  dds.wcc <- DESeq(dds.wcc)
+  res.kpt185_dmso.nuc.name.ashr <- lfcShrink(dds = dds.wcc, coef =  "group_kpt185_nuclear_vs_dmso_nuclear", type = "ashr")
+
+# Add gene type column to results
+res.kpt185_dmso.cyto.name.ashr <- add_gene_type(res.kpt185_dmso.cyto.name.ashr, gene_type)
+res.kpt185_dmso.nuc.name.ashr <- add_gene_type(res.kpt185_dmso.nuc.name.ashr, gene_type)
+
+# Add exon counts column to results
+res.kpt185_dmso.cyto.name.ashr <- add_exon_count(res.kpt185_dmso.cyto.name.ashr, gene_type)
+res.kpt185_dmso.nuc.name.ashr <- add_exon_count(res.kpt185_dmso.nuc.name.ashr, gene_type)
+
+# Add broader_type column to results
+res.kpt185_dmso.cyto.name.ashr <- add_broader_type(res.kpt185_dmso.cyto.name.ashr, gene_type)
+res.kpt185_dmso.nuc.name.ashr <- add_broader_type(res.kpt185_dmso.nuc.name.ashr, gene_type)
+
+# Sort results by Log2FC, add gene symbol and save results to a txt file
+res.kpt185_dmso.cyto.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185_dmso.cyto.name.ashr, "DE_dmsoNuc_vs_dmsoCyto_ashr")
+
+res.kpt185_dmso.nuc.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185_dmso.nuc.name.ashr, "DE_kpt185Nuc_vs_kpt185Cyto_ashr")
+
+# Save sorted files as a list
+DE_results.wcc = list()
+DE_results.wcc[["kpt185_dmso.cyto"]]  <- res.kpt185_dmso.cyto.name.ashr.logfc_sorted
+DE_results.wcc[["kpt185_dmso.nuc"]]  <- res.kpt185_dmso.nuc.name.ashr.logfc_sorted
+
+```
+
+###########################################
+## Gene enrichment analysis
+###########################################
+
+MSigDBs can be downloaded from R with the function msigdbr (see below). 
+
+```{r enrichment analysis with MSigDB}
+# You can modify the category and subcategory parameters below to retrieve specific gene sets from GSEA's MSIG database.
+for (i in names(DE_results.wcc)){
+  # Reset gene lists for each analysis
+  genes = c()
+  geneList = list()
+  
+  print(i)
+  # skip ko25A_vs_koNone results
+  if (dim(DE_results.wcc[[i]])[1] == 0){
+    print("skipped! The dds results table is empty.")
+    next
+  }
+  my_prefix <- i
+  
+  ## Gene list of interest (using Log2FC > 0.5 and FDR <= 0.05)
+  genes <- rownames(subset(DE_results.wcc[[i]], log2FoldChange > 0.5 & padj <= 0.05))
+  my_ordered_dds_res <- DE_results.wcc[[i]][order(DE_results.wcc[[i]]$log2FoldChange, decreasing = T, na.last = T), ]
+  geneList <- my_ordered_dds_res$log2FoldChange
+  names(geneList) <- rownames(my_ordered_dds_res)
+  
+  ########################################
+  ## H: hallmark gene sets
+  ########################################
+  # Fetch gene sets
+  msig_h <- msigdbr(species = "Homo sapiens", category = "H") %>% dplyr::select(gs_name, ensembl_gene, ) 
+  
+  # Run overrepresentation analysis
+  run_overrepresentation_analysis_2(gene_set = msig_h, dds_res = DE_results.wcc[[i]], analysis_name = my_prefix, gs_name = "H", type = "general")
+  
+  # Run Gene Set Enrichment Analysis
+  run_enrichment_analysis_2(gene_set = msig_h, geneList = geneList, analysis_name = my_prefix, gs_name = "H", type = "general")
+  
+  
+  ###########################################################################
+  ## C3 regulatory target gene sets => TFT: transcription factor targets
+  ###########################################################################
+  # Fetch gene sets
+  msig_c3_gtrd <- msigdbr(species = "Homo sapiens", category = "C3", subcategory = "TFT:GTRD") %>% dplyr::select(gs_name, ensembl_gene, )
+  msig_c3_tft <- msigdbr(species = "Homo sapiens", category = "C3", subcategory = "TFT:TFT_Legacy") %>% dplyr::select(gs_name, ensembl_gene, )
+  
+  # Run overrepresentation analysis
+  run_overrepresentation_analysis_2(gene_set = msig_c3_gtrd,  dds_res = DE_results.wcc[[i]], analysis_name = my_prefix, gs_name = "C3_TFT_GTRD", type = "general")
+  run_overrepresentation_analysis_2(gene_set = msig_c3_tft,  dds_res = DE_results.wcc[[i]], analysis_name = my_prefix, gs_name = "C3_TFT_Legacy", type = "general")
+  
+  # Run Gene Set Enrichment Analysis
+  run_enrichment_analysis_2(gene_set = msig_c3_gtrd, geneList = geneList, analysis_name = my_prefix, gs_name = "C3_TFT_GTRD", type = "general")
+  run_enrichment_analysis_2(gene_set = msig_c3_tft, geneList = geneList, analysis_name = my_prefix, gs_name = "C3_TFT_Legacy", type = "general")
+  ##########################################################
+  ## C2 curated gene sets => CP:REACTOME Canonical pathways
+  ##########################################################
+  # Fetch gene sets
+  msig_c2_reactome <- msigdbr(species = "Homo sapiens", category = "C2", subcategory = "CP:REACTOME") %>% dplyr::select(gs_name, ensembl_gene, )
+  
+  # Run overrepresentation analysis
+  run_overrepresentation_analysis_2(gene_set = msig_c2_reactome,  dds_res = DE_results.wcc[[i]], analysis_name = i, gs_name = "C2_CP_REACTOME", type = "general") # using type = "general to avoid error in treeplot
+  
+  # Run Gene Set Enrichment Analysis
+  run_enrichment_analysis_2(gene_set = msig_c2_reactome, geneList = geneList, analysis_name = my_prefix, gs_name = "C2_CP_REACTOME", type = "reactome")
+}
+```
+
+#################################
+## GO enrichment analysis
 #################################
 
 ```{r GO enrichment}
 # The code below selects a list of gene IDs based on a specific Log2FC cutoff for running Overrepresentation analysis with the R function 'enricher'. The list of genes are stored in the variable "gene" for gene IDs = Ensembl gene IDs, and in the variable  'gene.entrezid' for a list of Entrez gene IDs. Usually, geneset databases use eithr Entrez gene IDs or gene symbols as identifiers, so in some cases it is handy to count with a list of genes using Entrez gene IDs. 
-
 #The same code also extract the entire list of genes used for the Differential Expression Analysis as an R list element, using Ensemble gene IDs as keys (names) and Log2FC as values. This geneList is used as input for running Gene Set Enrichment Analysis with the function 'GSEA'. If needed, the code below also generates the same geneList but using Entrez gene IDs as keys.
-
-ggo = list()
-go.enr = list()
-
-
-ego_up <- enrichGO(gene = genes_up,
-                  OrgDb= "org.Hs.eg.db",
-                  ont = "BP", # Either MF, BP, CC or ALL
-                  pAdjustMethod = "BH",
-                  qvalueCutoff  = 0.05,
-                  keyType = 'ENSEMBL',
-                  readable      = TRUE,
-                  minGSSize = 10,
-                  maxGSSize = 500
-                  )
-
-ego_down <- enrichGO(gene = genes_down,
-                  OrgDb= "org.Hs.eg.db",
-                  ont = "BP", # Either MF, BP, CC or ALL
-                  pAdjustMethod = "BH",
-                  qvalueCutoff  = 0.05,
-                  keyType = 'ENSEMBL',
-                  readable      = TRUE,
-                  minGSSize = 10,
-                  maxGSSize = 500
-                  )
-
-p1_up <- dotplot(ego_up, showCategory=30)
-p2_up <- mutate(ego_up, qscore = -log(p.adjust, base=10)) %>% 
-    barplot(x="qscore")
-p1_down <- dotplot(ego_down, showCategory=30)
-p2_down <- mutate(ego_down, qscore = -log(p.adjust, base=10)) %>% 
-    barplot(x="qscore")
-
-ggsave2(filename = paste0(my_prefix,"_UP_GO_enr_BP_dotplot.pdf"), plot = p1_up, path = "./ClusterProfiler")
-ggsave2(filename = paste0(my_prefix,"_UP_GO_enr_BP_barplot.pdf"), plot = p2_up, path = "./ClusterProfiler")
-ggsave2(filename = paste0(my_prefix,"_DOWN_GO_enr_BP_dotplot.pdf"), plot = p1_down, path = "./ClusterProfiler")
-ggsave2(filename = paste0(my_prefix,"_DOWN_GO_enr_BP_barplot.pdf"), plot = p2_down, path = "./ClusterProfiler")
-onthology <- "BP"
-write.table(ego_up, file = paste0("./ClusterProfiler/",my_prefix,"_",onthology,"_go_enrich_UP.txt"), sep = "\t", col.names=NA, )
-write.table(ego_down, file = paste0("./ClusterProfiler/",my_prefix,"_",onthology,"_go_enrich_DOWN.txt"), sep = "\t", col.names=NA)
-
-
-print(p1_up)
-print(p2_up)
-print(p1_down)
-print(p2_down)
+go.class = list()
+go.overrep = list()
+go.gsea = list()
+for (i in names(DE_results.wcc)){
+ 
+  dir.create(path = paste0("./GO/", i), showWarnings = FALSE, recursive = TRUE)
+  for (ontho in c("BP", "MF", "CC")){ 
+    my_id = paste0(i,"_",ontho)
+    
+    print(paste("go_classification", i, ontho))
+    go.class[[my_id]] <- go_classification(dds_res = DE_results.wcc[[i]], 
+                             my_file = i, 
+                             onthology = ontho)
+    
+    print(paste("go_overrep", i, ontho))
+    go.overrep[[my_id]] <- go_overrep(dds_res = DE_results.wcc[[i]], 
+                                   my_file = i, 
+                                   onthology = ontho)
+    
+    print(paste("go_gsea", i, ontho))
+    go.gsea[[my_id]] <- go_gsea(dds_res = DE_results.wcc[[i]], 
+                                   my_file = i, 
+                                   onthology = ontho)
+  }
+}
 ```
 
+# Analysis by exon counts
 
+```{r analysis by exon counts}
+
+for (i in names(DE_results)){
+  print(i)
+  de_results <- DE_results[[i]]
+  de_results$exon_count <- as.factor(de_results$exon_count)
+  
+  # Create new column grouping genes by a range of exon counts (e.g. 1, 2-9, 10-99, 100-999, repeats, etc)
+  de_results$exon_range <- as.character(de_results$exon_count)
+  de_results$exon_range[nchar(as.vector(de_results$exon_range)) == 2] <- "10-99"
+  de_results$exon_range[nchar(as.vector(de_results$exon_range)) == 3] <- ">=100"
+  de_results$exon_range <- factor(de_results$exon_range, levels=c("1", "2", "3","4","5","6","7","8","9","10-99",">=100","Repeat"))
+  
+  logfc_by_exon_count.p <- ggviolin(data = as.data.frame(de_results), x = "exon_range", y = "log2FoldChange", ggtheme = theme_minimal()) #+ ylim(-0.5,0.5)
+  logfc_by_exon_count.p <- ggpar(p = logfc_by_exon_count.p, title = i)
+  
+  ggsave2(filename = paste0(i,"_logFC_by_exon_counts.pdf"), plot = logfc_by_exon_count.p, path = "./Plots")
+  
+  print(logfc_by_exon_count.p)
+}
+```
 
 ###############################################################################################################################
 ###############################################################################################################################
