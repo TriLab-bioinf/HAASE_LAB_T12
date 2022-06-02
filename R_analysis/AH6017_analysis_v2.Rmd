@@ -33,6 +33,7 @@ suppressMessages(library("enrichplot"))
 suppressMessages(library("ReactomePA"))
 suppressMessages(library("ggupset"))
 suppressMessages(library("cowplot"))
+library(colortools)
 ```
 
 # Define functions
@@ -447,6 +448,8 @@ for (gt in gene_type_factors){
 
 # Run enrichment analysis for treatment effect
 (res.kpt185_vs_dmso.name.ashr.logfc_sorted)
+
+## Gene enrichment
 ```{r gene enrichment analysis}
 
 # Get enrichment functions
@@ -514,7 +517,7 @@ my_prefix_down <- "kpt185_vs_dmso_DOWN"
 ```
 
 #################################
-# Gene / GO enrichment analysis
+## Gene / GO enrichment analysis
 #################################
 
 ```{r GO enrichment analysis}
@@ -588,15 +591,23 @@ res.kpt185_dmso.cyto.name.ashr <- add_broader_type(res.kpt185_dmso.cyto.name.ash
 res.kpt185_dmso.nuc.name.ashr <- add_broader_type(res.kpt185_dmso.nuc.name.ashr, gene_type)
 
 # Sort results by Log2FC, add gene symbol and save results to a txt file
-res.kpt185_dmso.cyto.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185_dmso.cyto.name.ashr, "DE_dmsoNuc_vs_dmsoCyto_ashr")
+res.kpt185_dmso.cyto.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185_dmso.cyto.name.ashr, "DE_kpt185_vs_dmso.cyt_ashr")
 
-res.kpt185_dmso.nuc.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185_dmso.nuc.name.ashr, "DE_kpt185Nuc_vs_kpt185Cyto_ashr")
+res.kpt185_dmso.nuc.name.ashr.logfc_sorted <- sort_and_write_res_table(res.kpt185_dmso.nuc.name.ashr, "DE_kpt185_vs_dmso.nuc_ashr")
 
 # Save sorted files as a list
 DE_results.wcc = list()
 DE_results.wcc[["kpt185_dmso.cyto"]]  <- res.kpt185_dmso.cyto.name.ashr.logfc_sorted
 DE_results.wcc[["kpt185_dmso.nuc"]]  <- res.kpt185_dmso.nuc.name.ashr.logfc_sorted
 
+```
+
+## DE gene counts for WCC
+```{r Exon count analysis for WCC}
+res.kpt185_dmso.cyto.name.ashr$contrast <- "kpt185_dmso.cyto"
+res.kpt185_dmso.nuc.name.ashr$contrast <- "kpt185_dmso.nuc"
+DE_ALL.df <- as.data.frame(rbind(res.kpt185_dmso.cyto.name.ashr, res.kpt185_dmso.nuc.name.ashr))
+ggboxplot(data = res.kpt185_dmso.cyto.name.ashr, x = )
 ```
 
 ###########################################
@@ -704,10 +715,11 @@ for (i in names(DE_results.wcc)){
 # Analysis by exon counts
 
 ```{r analysis by exon counts}
-
-for (i in names(DE_results)){
+dir.create(path = "./Plots/Non_coding", showWarnings = FALSE)
+DE_results_ALL <- c(DE_results, DE_results.wcc)
+for (i in c(names(DE_results_ALL), names(DE_results.wcc))){
   print(i)
-  de_results <- DE_results[[i]]
+  de_results <- DE_results_ALL[[i]]
   de_results$exon_count <- as.factor(de_results$exon_count)
   
   # Create new column grouping genes by a range of exon counts (e.g. 1, 2-9, 10-99, 100-999, repeats, etc)
@@ -715,14 +727,94 @@ for (i in names(DE_results)){
   de_results$exon_range[nchar(as.vector(de_results$exon_range)) == 2] <- "10-99"
   de_results$exon_range[nchar(as.vector(de_results$exon_range)) == 3] <- ">=100"
   de_results$exon_range <- factor(de_results$exon_range, levels=c("1", "2", "3","4","5","6","7","8","9","10-99",">=100","Repeat"))
+  de_results$coding_type <- "non-coding"
+  de_results$coding_type[de_results$gene_type == "protein_coding"] <- "coding"
+  de_results$coding_type[grep("pseudogene", de_results$gene_type)] <- "pseudogene"
   
-  logfc_by_exon_count.p <- ggviolin(data = as.data.frame(de_results), x = "exon_range", y = "log2FoldChange", ggtheme = theme_minimal()) #+ ylim(-0.5,0.5)
+  logfc_by_exon_count.p <- ggboxplot(data = as.data.frame(de_results), 
+                                    x = "exon_range", 
+                                    y = "log2FoldChange", 
+                                    ggtheme = theme_minimal(), 
+                                    facet.by = "coding_type", 
+                                    add = c("jitter"), 
+                                    add.params = list(size = 0.1, jitter = 0.1), 
+                                    color = "exon_range", 
+                                    palette = c(wheel("darkblue", num = 12)
+                                    )) + 
+                                      geom_hline(yintercept = 0,
+                                                   linetype = 2, 
+                                                   color = "black") +
+                                      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  
   logfc_by_exon_count.p <- ggpar(p = logfc_by_exon_count.p, title = i)
   
-  ggsave2(filename = paste0(i,"_logFC_by_exon_counts.pdf"), plot = logfc_by_exon_count.p, path = "./Plots")
+  ggsave2(filename = paste0(i,"_logFC_by_exon_counts.pdf"), plot = logfc_by_exon_count.p, path = "./Plots", width = 11)
   
-  print(logfc_by_exon_count.p)
+  # For non-coding RNAs
+  nc.df <- subset(de_results, coding_type == "non-coding")
+  for (nc in unique(nc.df$broader_type)){
+    my_type.df <- subset(nc.df, broader_type == nc)
+    
+    my_type.p <- ggboxplot(data = as.data.frame(my_type.df), 
+                                    x = "exon_range", 
+                                    y = "log2FoldChange", 
+                                    ggtheme = theme_minimal(), 
+                                    facet.by = "coding_type", 
+                                    add = c("jitter"), 
+                                    add.params = list(size = 0.1, jitter = 0.1), 
+                                    color = "exon_range", 
+                                    palette = c(wheel("darkblue", num = 12)
+                                    )) + 
+                             geom_hline(yintercept = 0,
+                                                   linetype = 2, 
+                                                   color = "black") +
+                             theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+                           
+    my_type.p <- ggpar(p = my_type.p, title = paste("Condition =",i,"Non-coding RNA =",nc))
+    ggsave2(filename = paste0(i,"_logFC_by_exon_counts_Non_coding_",nc,".pdf"), 
+            plot = my_type.p, 
+            path = "./Plots/Non_coding")
+  }
+  
 }
+```
+
+# boxplot lncRNAs kp1_dmso_nuc
+```{r boxplot lncRNAs kp1_dmso_nuc}
+de_results.lncrna <- subset(DE_results.wcc[["kpt185_dmso.nuc"]], gene_type == "lncRNA")
+
+de_results.lncrna$exon_count <- as.factor(de_results.lncrna$exon_count)
+  
+  # Create new column grouping genes by a range of exon counts (e.g. 1, 2-9, 10-99, 100-999, repeats, etc)
+  de_results.lncrna$exon_range <- as.character(de_results.lncrna$exon_count)
+  de_results.lncrna$exon_range[nchar(as.vector(de_results.lncrna$exon_range)) == 2] <- "10-99"
+  de_results.lncrna$exon_range[nchar(as.vector(de_results.lncrna$exon_range)) == 3] <- ">=100"
+  de_results.lncrna$exon_range <- factor(de_results.lncrna$exon_range, levels=c("1", "2", "3","4","5","6","7","8","9","10-99",">=100","Repeat"))
+  
+  
+logfc_by_exon_count.p <- ggboxplot(data = as.data.frame(de_results.lncrna), 
+                                    x = "exon_range", 
+                                    y = "log2FoldChange", 
+                                    ggtheme = theme_minimal(), 
+                                    add = c("jitter"), 
+                                    add.params = list(size = 0.1, jitter = 0.1), 
+                                    color = "exon_range", 
+                                    palette = c(wheel("darkblue", num = 12)
+                                    )) + 
+                                      geom_hline(yintercept = 0,
+                                                   linetype = 2, 
+                                                   color = "black") +
+                                      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  
+  logfc_by_exon_count.p <- ggpar(p = logfc_by_exon_count.p, title = paste0("kpt185_dmso.nuc (",de_results.lncrna$gene_type,")"))
+  
+logfc_by_exon_count.p
+  
+ggsave2(filename = paste0("kpt185_dmso.nuc_logFC_by_exon_counts_lncRNA.pdf"), plot = logfc_by_exon_count.p, path = "./Plots", width = 11)
+  
+de_results.lncrna.lfc_0.5 <- subset(de_results.lncrna, de_results.lncrna$log2FoldChange >= 0.5)
+  
+
 ```
 
 ###############################################################################################################################
